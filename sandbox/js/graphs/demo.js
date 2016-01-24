@@ -1,7 +1,7 @@
 var DemoGraph = (function($) {
 
   var dataset = [];
-  var randMax = 2000;
+  var randMax = 100;
 
   var initData = function(numValues) {
     var xVals = [];
@@ -25,16 +25,18 @@ var DemoGraph = (function($) {
   var init = function() {
     initData(100);
 
-    var svgWidth = 100;
-    var svgHeight = "500";
+    var svgWidth = 1000;
+    var svgHeight = 500;
     var yPadding = 20;
-    var xPadding = 1;
+    var xPadding = 30;
 
+    /* Draw SVG */
     var svg = d3.select("body")
                 .append("svg")
-                .attr("width", svgWidth + "%")
+                .attr("width", svgWidth)
                 .attr("height", svgHeight);
 
+    /* Scales */
     var xScale = d3.scale.linear()
                     .domain([0, d3.max(dataset, function(d) {
                         return d[0];
@@ -53,12 +55,13 @@ var DemoGraph = (function($) {
                     })])
                     .range([2,5]);
 
+    /* Scatterplot */
     svg.selectAll("circle")
         .data(dataset)
         .enter()
         .append("circle")
         .attr("cx", function(d) {
-          return xScale(d[0]) +"%";
+          return xScale(d[0]);
         })
         .attr("cy", function(d) {
           return yScale(d[1]);
@@ -67,6 +70,7 @@ var DemoGraph = (function($) {
             return rScale(d[1]);
         });
 
+    /* Point labels */
     svg.selectAll("text")
         .data(dataset)
         .enter()
@@ -75,11 +79,32 @@ var DemoGraph = (function($) {
           return d[0] + "," + d[1];
         })
         .attr("x", function(d) {
-          return xScale(d[0]) + "%";
+          return xScale(d[0]);
         })
         .attr("y", function(d) {
           return yScale(d[1]);
         });
+
+    /* Axes */
+    var xAxis = d3.svg.axis()
+                        .scale(xScale)
+                        .orient("bottom")
+                        .ticks(5);
+
+    svg.append("g")
+        .attr("class", "axis")
+        .attr("transform", "translate(0,"+ (svgHeight - yPadding) +")")
+        .call(xAxis);
+
+    var yAxis = d3.svg.axis()
+                  .scale(yScale)
+                  .orient("left")
+                  .ticks(5);
+
+    svg.append("g")
+        .attr("class", "axis")
+        .attr("transform", "translate(" + xPadding + ",0)")
+        .call(yAxis);
   };
 
   return {
