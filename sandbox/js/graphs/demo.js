@@ -1,75 +1,62 @@
 var DemoGraph = (function($) {
 
   var dataset = [];
-  var randMax = 100;
+  var randMax = 500;
 
   var initData = function(numValues) {
+    var xVals = [];
     for (var i = 0; i < numValues; i++) {
       var random = Math.round(Math.random() * randMax);
-      dataset.push(random);
+      xVals.push(random);
+    }
+
+    var yVals = [];
+    for (var i = 0; i < numValues; i++) {
+      var random = Math.round(Math.random() * randMax);
+      yVals.push(random);
+    }
+
+    for (i = 0; i < numValues; i++) {
+      dataset.push([xVals[i], yVals[i]]);
     }
   };
 
   var init = function() {
     initData(100);
 
-    var width = 500;
-    var height = 500;
-
-    var barsInRow = 20;
-    var barWidth = (width - barsInRow) / barsInRow;
-    var maxBarHeight = randMax;
+    var svgWidth = 500;
+    var svgHeight = 500;
 
     var svg = d3.select("body")
                 .append("svg")
-                .attr("width", width)
-                .attr("height", height);
+                .attr("width", svgWidth)
+                .attr("height", svgHeight);
 
-    svg.selectAll("rect")
+    svg.selectAll("circle")
         .data(dataset)
         .enter()
-        .append("rect")
-        .attr("x", function(d, i) {
-          xpos = i % barsInRow;
-          return xpos * (barWidth + 1);
+        .append("circle")
+        .attr("cx", function(d) {
+          return d[0];
         })
-        .attr("y", function(d, i) {
-          ypos = i/barsInRow;
-          return (parseInt(ypos) + 1) * maxBarHeight - d;
+        .attr("cy", function(d) {
+          return d[1];
         })
-        .attr("width", barWidth)
-        .attr("height", function(d) {
-          return d;
-        })
-        .attr("fill", function(d) {
-          return "rgb(" + (d*3) + ",0,0)";
-        });
+        .attr("r", 5);
 
     svg.selectAll("text")
         .data(dataset)
         .enter()
         .append("text")
         .text(function(d) {
-          return d;
+          return d[0] + "," + d[1];
         })
-        .attr("x", function(d, i) {
-          xpos = i % barsInRow;
-          return xpos * (barWidth + 1) + barWidth/2;
+        .attr("x", function(d) {
+          return d[0];
         })
-        .attr("y", function(d, i) {
-          ypos = i/barsInRow;
-          y = (parseInt(ypos) + 1) * maxBarHeight - d + 12;
-          if (d > 12) {
-            return y;
-          }
-          else {
-            return y - 13;
-          }
-        })
-        .attr("font-family", "sans-serif")
-        .attr("font-size", "11px")
-        .attr("fill", "white")
-        .attr("text-anchor", "middle");
+        .attr("y", function(d) {
+          return d[1];
+        });
   };
 
   return {
